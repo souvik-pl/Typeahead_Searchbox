@@ -4,6 +4,7 @@ import { cancelablePromise, PromiseCancel } from "./common/cancelable-promise";
 import { fetchSearchResults } from "./rest-client/search";
 import { Item } from "./common/common.type";
 import useDebounce from "./common/useDebounce";
+import ResultHighlight from "./components/ResultHighlight";
 
 function App() {
   const [searchInputData, setSearchInputData] = useState<string>("");
@@ -53,7 +54,7 @@ function App() {
                 selectItem(result.name);
               }}
             >
-              {result.name}
+              <ResultHighlight searchQuery={searchInputData} resultItem={result.name} />
             </li>
           ))}
       </ul>

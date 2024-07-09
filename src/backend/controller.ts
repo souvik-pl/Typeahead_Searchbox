@@ -9,6 +9,6 @@ export async function getSearchResults(query: string): Promise<Item[]> {
     );
     setTimeout(() => {
       resolve(results);
-    }, 2000);
+    }, 700);
   });
 }

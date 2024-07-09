@@ -24,6 +24,7 @@ function ResultHighlight({ searchQuery, resultItem }: ResultHighlightProps) {
         color: "gray",
         display: "flex",
         alignItems: "center",
+        whiteSpace: "pre",
       }}
     >
       {resultItemFirst}

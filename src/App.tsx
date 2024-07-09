@@ -5,6 +5,7 @@ import { fetchSearchResults } from "./rest-client/search";
 import { Item } from "./common/common.type";
 import useDebounce from "./common/useDebounce";
 import ResultHighlight from "./components/ResultHighlight";
+import "./common/cache";
 
 function App() {
   const [searchInputData, setSearchInputData] = useState<string>("");
@@ -18,8 +19,8 @@ function App() {
     cancelPreviousSearch.current = resultObj.cancel;
     resultObj.promise.then((result) => {
       console.log(result);
-
       setSearchResults(result);
+      window.resultCache.set(searchQuery, result);
     });
   }
 
@@ -28,7 +29,17 @@ function App() {
     const searchQuery: string = event.currentTarget.value;
     setSearchInputData(searchQuery);
     if (searchQuery.trim() === "") return;
+    if (checkCache(searchQuery)) return;
     debounceSearch(searchQuery);
+  }
+
+  function checkCache(searchQuery: string) {
+    if (window.resultCache.has(searchQuery)) {
+      setSearchResults(window.resultCache.get(searchQuery)!);
+      return true;
+    }
+
+    return false;
   }
 
   function selectItem(itemName: string) {

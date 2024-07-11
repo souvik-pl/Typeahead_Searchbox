@@ -1,9 +1,8 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./App.module.css";
 import { cancelablePromise, PromiseCancel } from "./common/cancelable-promise";
 import { fetchSearchResults } from "./rest-client/search";
 import { Item } from "./common/common.type";
-import useDebounce from "./common/useDebounce";
 import ResultHighlight from "./components/ResultHighlight";
 import "./common/cache";
 
@@ -12,7 +11,16 @@ function App() {
   const [searchResults, setSearchResults] = useState<Item[]>([]);
   const cancelPreviousSearch = useRef<() => void>();
 
-  const { debounce: debounceSearch } = useDebounce(searchItems, 300);
+  // Debouncing logic
+  useEffect(() => {
+    if (searchInputData.trim() === "") return;
+    if (checkCache(searchInputData)) return;
+    const timeoutID = setTimeout(() => {
+      searchItems(searchInputData);
+    }, 300);
+
+    return () => clearTimeout(timeoutID);
+  }, [searchInputData]);
 
   function searchItems(searchQuery: string) {
     const resultObj: PromiseCancel<Item[]> = cancelablePromise(fetchSearchResults(searchQuery));
@@ -28,9 +36,6 @@ function App() {
     cancelPreviousSearch.current?.();
     const searchQuery: string = event.currentTarget.value;
     setSearchInputData(searchQuery);
-    if (searchQuery.trim() === "") return;
-    if (checkCache(searchQuery)) return;
-    debounceSearch(searchQuery);
   }
 
   function checkCache(searchQuery: string) {

@@ -1,17 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-function useDebounce(callbackFn: (query: string) => void, delay: number) {
-  const [timerId, setTimerId] = useState<number | null>(null);
+function useDebounce(query: string, delay: number = 400) {
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
 
-  function debounce(query: string) {
-    if (timerId) clearTimeout(timerId);
-    let id = setTimeout(() => {
-      callbackFn(query);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
     }, delay);
-    setTimerId(id);
-  }
 
-  return { debounce };
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  return debouncedQuery;
 }
 
 export default useDebounce;
